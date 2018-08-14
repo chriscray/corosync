@@ -13,7 +13,6 @@
 %bcond_with systemd
 %bcond_with xmlconf
 %bcond_with runautogen
-%bcond_with libcgroup
 
 %global gitver %{?numcomm:.%{numcomm}}%{?alphatag:.%{alphatag}}%{?dirty:.%{dirty}}
 %global gittarver %{?numcomm:.%{numcomm}}%{?alphatag:-%{alphatag}}%{?dirty:-%{dirty}}
@@ -31,6 +30,7 @@ Source0: http://build.clusterlabs.org/corosync/releases/%{name}-%{version}%{?git
 Requires: corosynclib%{?_isa} = %{version}-%{release}
 
 # Build bits
+BuildRequires: gcc
 
 %if 0%{?suse_version}
 BuildRequires: groff-full
@@ -72,9 +72,6 @@ Requires(preun): /sbin/chkconfig
 %if %{with xmlconf}
 Requires: libxslt
 %endif
-%if %{with libcgroup}
-BuildRequires: libcgroup-devel
-%endif
 
 %prep
 %setup -q -n %{name}-%{version}%{?gittarver}
@@ -106,9 +103,6 @@ BuildRequires: libcgroup-devel
 %if %{with xmlconf}
 	--enable-xmlconf \
 %endif
-%if %{with libcgroup}
-	--enable-libcgroup \
-%endif
 	--with-initddir=%{_initrddir} \
 	--with-systemddir=%{_unitdir} \
 	--docdir=%{_docdir}
@@ -136,8 +130,6 @@ install -m 644 tools/corosync-notifyd.sysconfig.example \
 # /etc/sysconfig/corosync
 install -m 644 init/corosync.sysconfig.example \
    %{buildroot}%{_sysconfdir}/sysconfig/corosync
-
-%clean
 
 %description
 This package contains the Corosync Cluster Engine Executive, several default
